@@ -16,8 +16,8 @@ const Home = () => {
     let [user, setUser] = useProtectedContext();
 
     const logoutt = () => {
-        logout()
         setUser(null);
+        logout()
           }
          
 
@@ -58,6 +58,7 @@ const Home = () => {
 
     //borrar tweets
     const deleteTweet = (id) => {
+        if (window.confirm("Realmente quieres borrar el mensaje?"))
         firestore.collection("tweets")
             .doc(id)
             .delete()
@@ -67,18 +68,67 @@ const Home = () => {
             .catch(err => console.error(err.message))
     }
 
+    /*
     //likes tweets
     const likeTweet = (tweet) => {
         firestore.doc(`tweets/${tweet.id}`)
             .update({ likes: tweet.likes + 1 })
             .then(() => {
-                //getAllTweets()
+                getAllTweets()
             })
             .catch(err => console.error(err.message))
     }
 
+    */
+
+
+
+
+ const likeTweet = (tweet) =>{
+    let newLikedBy = [...tweet.likedBy, user.email];
+  
+     firestore.doc(`tweets/${tweet.id}`)
+     .update({ likedBy: newLikedBy })
+     .then(()=> console.log("success"))
+     .catch (()=> console.log("something went wrong"))
+   };
+    
+   const dislikeTweet = (tweet) =>{
+    let newLikedBy = tweet.likedBy.filter((like)=> like !== user.email)
+  
+     firestore.doc(`tweets/${tweet.id}`)
+     .update({ likedBy: newLikedBy })
+     .then(()=> console.log("success"))
+     .catch (()=> console.log("something went wrong"))
+   };  
+  
+   const showLikes = (tweet)=>{
+     if (tweet.likedBy && user.email){
+       const isLiked = tweet.likedBy.findIndex((liked)=> user.email === liked);
+       if (isLiked < 0){
+         return (
+           <>
+            <img className="like"src="./svgs/whiteheart.svg" onClick={() => likeTweet(tweet)}/>
+            </>
+         )
+       }
+       else {
+         return (
+           <>
+           <img className="dislike"src="./svgs/redheart.svg" onClick={() => dislikeTweet(tweet)}/>
+  
+           </>
+         )
+       }
+  
+     }
+  
+   }
+
+   
+  
+
     useEffect(() => {
-        //getAllTweets()
         const unsubscribe = firestore
             .collection("tweets")
             .onSnapshot(snapshot => {
@@ -125,6 +175,7 @@ const Home = () => {
                             <button onClick={() => deleteTweet(tweet.id)}>Borrar</button>
                             <div>
                                 <button onClick={() => likeTweet(tweet)}>Me gusta</button>
+                                
                                 <span>Likes: {tweet.likes}</span>
                             </div>
                             <hr />
