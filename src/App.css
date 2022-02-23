@@ -2,5 +2,16 @@ body *{
   padding: 0px;
   margin: 0px;
   font-size: 15px;
+  background-color: aquamarine;
 }
-  
+
+
+.likes img{
+  width:24px;
+  margin-right: 6px;
+  cursor: pointer;
+}
+
+.likes span.likeon{
+  color: #F50D5A;
+}

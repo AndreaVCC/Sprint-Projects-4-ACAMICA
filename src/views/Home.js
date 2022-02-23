@@ -4,6 +4,8 @@ import { firestore, logout } from '../firebase';
 // import heart from '../public/heart.svg';
 import { useProtectedContext } from '../context/Protected'
 import { Redirect } from 'react-router-dom';
+//import like from "../public/redheart.svg";
+//import dislike from "../public/whiteheart.svg";
 
 
 const Home = () => {
@@ -11,33 +13,60 @@ const Home = () => {
     //const [alarm, setAlarm] = useState([]);
     const [tweets, setTweets] = useState([]);
     const [body, setBody] = useState({});
-    const [hasUpdate, setUpdate] = useState(false);
+    //const [hasUpdate, setUpdate] = useState(false);
 
     let [user, setUser] = useProtectedContext();
 
     const logoutt = () => {
         setUser(null);
         logout()
-          }
-         
-
+    }
     //mostrar tweets
+    useEffect(() => {
+        const desuscribir = firestore
+            .collection("tweets")
+            .onSnapshot(snapshot => {
+                const tweets = snapshot.docs.map(doc => {
+                    return {
+                        displayName: doc.data().displayName,
+                        message: doc.data().message,
+                        email: doc.data().email,      
+                        autor: doc.data().autor,
+                        uid: doc.data().uid,
+                        likes: doc.data().likes || 0,
+                        id: doc.id,
+                        likedBy: doc.data().likedBy,
+                    }
+                })
+                setTweets(tweets);
+            });
+        return () => desuscribir();
+    }, []);
+
     const getAllTweets = () => {
         firestore
             .collection("tweets")
             //.limit(1) //limitar cuantos tweets mostrar
             //.where('likes','>',5) //mostrar solo tweets mayores de 5 likes
-            //.orderBy('user','desc') // ordenar de manera desc
+            //.orderBy("dateCreation",'desc') // ordenar de manera desc
             //.orderBy('likes','asc').startAt(0).endAt(1) // que muestre los de 0 a 1 likes
             .get()
             .then((snapshot) => {
                 const tweets = snapshot.docs.map((doc) => {
+                    console.log(doc.data())
+
                     return {
-                        message: doc.data().message,
                         displayName: doc.data().displayName,
-                        user: doc.data().user,
+                        message: doc.data().message,
+                        email: doc.data().email,      
+                        autor: doc.data().autor,
+                        uid: doc.data().uid,
                         likes: doc.data().likes || 0,
-                        id: doc.id
+                        id: doc.id,
+                        likedBy: doc.data().likedBy,
+                        dateCreation: doc.data().dateCreation,
+                        
+                        
                     };
                 });
                 setTweets(tweets);
@@ -49,9 +78,10 @@ const Home = () => {
         e.preventDefault();
         firestore
             .collection("tweets")
-            .add({ ...body, uid: user.uid, displayName: user.displayName})
+            .add({ ...body, uid: user.uid, displayName: user.displayName, email:user.email})
             .then(() => {
                 getAllTweets()
+                
             })
             .catch(err => console.error(err.message))
     }
@@ -59,13 +89,13 @@ const Home = () => {
     //borrar tweets
     const deleteTweet = (id) => {
         if (window.confirm("Realmente quieres borrar el mensaje?"))
-        firestore.collection("tweets")
-            .doc(id)
-            .delete()
-            .then(() => {
-                getAllTweets()
-            })
-            .catch(err => console.error(err.message))
+            firestore.collection("tweets")
+                .doc(id)
+                .delete()
+                .then(() => {
+                    getAllTweets()
+                })
+                .catch(err => console.error(err.message))
     }
 
     /*
@@ -78,77 +108,72 @@ const Home = () => {
             })
             .catch(err => console.error(err.message))
     }
-
-    */
-
+*/
 
 
+  
+ //// LIKES /////
+ //da like al tweet
+ const likeTweet = (id, likes, uid, likedBy) => {
+    let newLikedBy = [...likedBy, uid];
+    firestore.doc(`tweets/${id}`).update({ likedBy: newLikedBy });
+  }
 
- const likeTweet = (tweet) =>{
-    let newLikedBy = [...tweet.likedBy, user.email];
-  
-     firestore.doc(`tweets/${tweet.id}`)
-     .update({ likedBy: newLikedBy })
-     .then(()=> console.log("success"))
-     .catch (()=> console.log("something went wrong"))
-   };
-    
-   const dislikeTweet = (tweet) =>{
-    let newLikedBy = tweet.likedBy.filter((like)=> like !== user.email)
-  
-     firestore.doc(`tweets/${tweet.id}`)
-     .update({ likedBy: newLikedBy })
-     .then(()=> console.log("success"))
-     .catch (()=> console.log("something went wrong"))
-   };  
-  
-   const showLikes = (tweet)=>{
-     if (tweet.likedBy && user.email){
-       const isLiked = tweet.likedBy.findIndex((liked)=> user.email === liked);
-       if (isLiked < 0){
-         return (
-           <>
-            <img className="like"src="./svgs/whiteheart.svg" onClick={() => likeTweet(tweet)}/>
-            </>
-         )
-       }
-       else {
-         return (
-           <>
-           <img className="dislike"src="./svgs/redheart.svg" onClick={() => dislikeTweet(tweet)}/>
-  
-           </>
-         )
-       }
-  
-     }
-  
-   }
+  //quita el like al tweet
+  const dislikeTweet = (id, uid, likedBy) => {
+    let newNewLikedBy = likedBy.filter((userUid) => uid !== userUid);
+    firestore.doc(`tweets/${id}`).update({ likedBy: newNewLikedBy });
+  }
 
-   
-  
+   //mostrar like
+   const showLike = (likersList, id, likes) => {
+    if (likersList && user) {
+      const youLiked = likersList.findIndex((liker) => user.uid === liker);
+      //si la persona no le ha dado like
+      if (youLiked < 0) {
+        return (
+          <>
+            <span onClick={() => likeTweet(id, likes, user.uid, likersList)} className="likes">
+              <img src="./image/likeoff.svg" alt=""/>
+              <span>{likersList.length}</span>
+            </span>
+          </>
+        );
+      } else {
+        //si la persona le dio like
+        return (
+          <>
+            <span onClick={() => dislikeTweet(id, user.uid, likersList)} className="likes">
+              <img  className="like" src="./image/likeon.svg" alt=""/>
+              <span className="likeon">{likersList.length}</span>
+            </span>
+          </>
+        );
+      }
+    } else {
+      return (
+        <>
+          <span onClick={() => likeTweet(id, likes, user.id, likersList)} className="likes">
+            <img className="like" src="./image/likeoff.svg" alt=""/>
+            <span>{likes ? likes : 0}</span>
+          </span>
+        </>
+      );
+    }
+  }
 
-    useEffect(() => {
-        const unsubscribe = firestore
-            .collection("tweets")
-            .onSnapshot(snapshot => {
-                const tweets = snapshot.docs.map(doc => {
-                    return {
-                        displayName: doc.data().displayName,
-                        message: doc.data().message,
-                        user: doc.data().user,
-                        likes: doc.data().likes || 0,
-                        id: doc.id
-                    }
-                })
-                setTweets(tweets);
-                });
-        return () => unsubscribe();
-    }, []);
+
+ 
 
     const handleChange = (e) => {
         let newTweet = {
             ...body,
+            dateCreation: new Date(),//user.gettTimestamp().toDate().toString(),
+            tweet: e.target.value,
+            uid: user.uid,
+            email: user.email,
+            user: user.displayName,
+            likedBy: [],
             [e.target.name]: e.target.value
         };
         setBody(newTweet)
@@ -174,9 +199,7 @@ const Home = () => {
                             <p>Autor: {tweet.displayName}</p>
                             <button onClick={() => deleteTweet(tweet.id)}>Borrar</button>
                             <div>
-                                <button onClick={() => likeTweet(tweet)}>Me gusta</button>
-                                
-                                <span>Likes: {tweet.likes}</span>
+                            {showLike(tweet.likedBy, tweet.id, tweet.likes)}                            
                             </div>
                             <hr />
                         </div>
