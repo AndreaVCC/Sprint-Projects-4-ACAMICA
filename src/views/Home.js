@@ -157,7 +157,6 @@ const Home = () => {
       <form className="form" onSubmit={createTweet}>
         <textarea
           autoComplete="off"
-          //value={body.message}
           onChange={handleChange}
           placeholder="Escribe un tweet"
           name="message"
@@ -170,7 +169,6 @@ const Home = () => {
 
       <div className="container_principal">
         {tweets.map((tweet) => {
-          console.log(tweet)
           return (
             <div className="container_home" key={tweet.id}>
               <div className="container_autor_trash">
