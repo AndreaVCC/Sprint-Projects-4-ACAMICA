@@ -1,0 +1,29 @@
+body,html *{
+  padding: 0px;
+  margin: 0px;
+  background-color: #2E132C;
+  color: white;
+  box-sizing: border-box;
+
+}
+
+h1 {
+  font-size:36px;
+}
+
+h2 {
+  font-size:20px;
+}
+
+p{
+  font-size: 18px;
+}
+
+.p_purple{
+  color: #60265B;
+}
+
+.p_pink{
+  color: #F50D5A;
+}
+

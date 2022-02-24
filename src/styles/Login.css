@@ -1,0 +1,62 @@
+/* @font-face {
+    font-family: Silkscreen;
+    src: url(../fonts/slkscrb.ttf);
+  } */
+
+.container {
+    display: flex;
+    flex-flow: column wrap;
+    padding: 51px;
+    height: 100vh;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+.container_logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 50%;
+}
+
+.logo_login {
+    width: 100%;
+    margin-bottom: 20%;
+}
+
+.container_login {
+    display: flex;
+    flex-flow: column wrap;
+    justify-content: space-around;
+    height: 50%;
+    align-items: center;
+}
+
+.google_sign {
+    height: 45px;
+    width: 100%;
+    cursor: pointer;
+}
+
+@media only screen and (min-width: 600px) {
+    .container {
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container_logo {
+        padding-right: 5%;
+        width: 45%;
+    }
+
+    .container_login {
+        padding-left: 5%;
+        width: 45%;
+    }
+
+    .logo_login {
+        margin-bottom: 0;
+    }
+}
