@@ -2,27 +2,15 @@ import '../styles/Home.css';
 import Header from '../components/Header';
 import { useEffect, useState } from 'react';
 import { firestore } from '../firebase';
-//import './App.css';
-// import heart from '../public/heart.svg';
 import { useProtectedContext } from '../context/Protected'
 import { Redirect } from 'react-router-dom';
-//import like from "../public/redheart.svg";
-//import dislike from "../public/whiteheart.svg";
 
 
 const Home = () => {
-
-  //const [alarm, setAlarm] = useState([]);
   const [tweets, setTweets] = useState([]);
   const [body, setBody] = useState({});
-  //const [hasUpdate, setUpdate] = useState(false);
-
   let [user, setUser] = useProtectedContext();
 
-  // const logoutt = () => {
-  //     setUser(null);
-  //     logout()
-  // }
   //mostrar tweets
   useEffect(() => {
     const desuscribir = firestore
@@ -56,7 +44,6 @@ const Home = () => {
       .then((snapshot) => {
         const tweets = snapshot.docs.map((doc) => {
           console.log(doc.data())
-
           return {
             displayName: doc.data().displayName,
             message: doc.data().message,
@@ -67,8 +54,6 @@ const Home = () => {
             id: doc.id,
             likedBy: doc.data().likedBy,
             dateCreation: doc.data().dateCreation,
-
-
           };
         });
         setTweets(tweets);
@@ -100,28 +85,13 @@ const Home = () => {
         .catch(err => console.error(err.message))
   }
 
-  /*
-  //likes tweets
-  const likeTweet = (tweet) => {
-      firestore.doc(`tweets/${tweet.id}`)
-          .update({ likes: tweet.likes + 1 })
-          .then(() => {
-              getAllTweets()
-          })
-          .catch(err => console.error(err.message))
-  }
-*/
-
-
-
-  //// LIKES /////
-  //da like al tweet
+  //da like
   const likeTweet = (id, likes, uid, likedBy) => {
     let newLikedBy = [...likedBy, uid];
     firestore.doc(`tweets/${id}`).update({ likedBy: newLikedBy });
   }
 
-  //quita el like al tweet
+  //quita el like
   const dislikeTweet = (id, uid, likedBy) => {
     let newNewLikedBy = likedBy.filter((userUid) => uid !== userUid);
     firestore.doc(`tweets/${id}`).update({ likedBy: newNewLikedBy });
@@ -131,7 +101,7 @@ const Home = () => {
   const showLike = (likersList, id, likes) => {
     if (likersList && user) {
       const youLiked = likersList.findIndex((liker) => user.uid === liker);
-      //si la persona no le ha dado like
+      //si no ha dado like
       if (youLiked < 0) {
         return (
           <>
@@ -142,10 +112,10 @@ const Home = () => {
           </>
         );
       } else {
-        //si la persona le dio like
+        //si se dio like antes
         return (
           <>
-            <span onClick={() => dislikeTweet(id, user.uid, likersList)} className="likes">
+            <span className="like_img_count" onClick={() => dislikeTweet(id, user.uid, likersList)} className="likes">
               <img className="like" src="./image/likeon.svg" alt="" />
               <span className="likeon">{likersList.length}</span>
             </span>
@@ -155,7 +125,7 @@ const Home = () => {
     } else {
       return (
         <>
-          <span onClick={() => likeTweet(id, likes, user.id, likersList)} className="likes">
+          <span className="like_img_count" onClick={() => likeTweet(id, likes, user.id, likersList)} className="likes">
             <img className="like" src="./image/likeoff.svg" alt="" />
             <span>{likes ? likes : 0}</span>
           </span>
@@ -163,8 +133,6 @@ const Home = () => {
       );
     }
   }
-
-
 
 
   const handleChange = (e) => {
@@ -181,49 +149,42 @@ const Home = () => {
     setBody(newTweet)
   }
 
-  // if (!user) {
-  //    return <p>Not logged in</p>
-  //  }
-
   if (!user) return <Redirect to='/' />
 
   return (
     <>
-      <div className="container_principal">
-        <Header />
+      <Header />
+      <form className="form" onSubmit={createTweet}>
+        <textarea
+          autoComplete="off"
+          //value={body.message}
+          onChange={handleChange}
+          placeholder="Escribe un tweet"
+          name="message"
+          type="text"
+        />
+        <br />
+        <button><img className="post"  src="./image/post.svg" alt="post" /></button>
+        
+      </form>
 
+      <div className="container_principal">
         {tweets.map((tweet) => {
           console.log(tweet)
           return (
             <div className="container_home" key={tweet.id}>
-              <p>Tweet: {tweet.message}</p>
-              <p>Autor: {tweet.displayName}</p>
-              <button onClick={() => deleteTweet(tweet.id)}>Borrar</button>
-              <div>
-                {showLike(tweet.likedBy, tweet.id, tweet.likes)}
+              <div className="container_autor_trash">
+                <p className="p_autor">{tweet.displayName}</p>
+                <img className="trash" onClick={() => deleteTweet(tweet.id)} src="./image/trash.svg" alt="trash" />
               </div>
+              <p className="p_post">{tweet.message}</p>
+              {showLike(tweet.likedBy, tweet.id, tweet.likes)}
               <hr />
             </div>
           )
         })
         }
-
-        <form onSubmit={createTweet}>
-          <textarea
-            autoComplete="off"
-            //value={body.message}
-            onChange={handleChange}
-            placeholder="Escribe un tweet"
-            name="message"
-            type="text"
-          />
-          <br />
-
-          <button>POST</button>
-        </form>
       </div>
-
-
     </>
   );
 }

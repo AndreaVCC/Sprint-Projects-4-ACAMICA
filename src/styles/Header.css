@@ -2,6 +2,7 @@
   display: flex;
   justify-content: space-between;
   height: 52px;
+  padding: 12px;
 }
 
 .container_header_logos {
@@ -13,7 +14,7 @@
 }
 
 .logosmall {
-  height: 70%;
+  height: 100%;
   
 }
 
@@ -32,6 +33,3 @@
   cursor: pointer;
 }
 
-@media only screen and (min-width: 600px) {
-
-}
