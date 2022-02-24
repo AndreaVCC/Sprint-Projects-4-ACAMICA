@@ -43,7 +43,6 @@ const Home = () => {
       .get()
       .then((snapshot) => {
         const tweets = snapshot.docs.map((doc) => {
-          console.log(doc.data())
           return {
             displayName: doc.data().displayName,
             message: doc.data().message,
