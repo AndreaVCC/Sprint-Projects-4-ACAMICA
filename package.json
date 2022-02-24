@@ -2,7 +2,7 @@
   "name": "devs-unite",
   "version": "0.1.0",
   "private": true,
-  "homepage":"https://AndreaVCC.github.io/Sprint-Projects-4-ACAMICA/",
+  "homepage":"https://AndreaVCC.github.io/Sprint-Projects-4-ACAMICA",
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
