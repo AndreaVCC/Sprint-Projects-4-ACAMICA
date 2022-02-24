@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/Sprint-Projects-4-ACAMICA/static/css/main.d476d61e.css",
-    "main.js": "/Sprint-Projects-4-ACAMICA/static/js/main.f6e49ff5.js",
+    "main.js": "/Sprint-Projects-4-ACAMICA/static/js/main.786bfc31.js",
     "static/js/787.99d6926f.chunk.js": "/Sprint-Projects-4-ACAMICA/static/js/787.99d6926f.chunk.js",
     "index.html": "/Sprint-Projects-4-ACAMICA/index.html",
     "main.d476d61e.css.map": "/Sprint-Projects-4-ACAMICA/static/css/main.d476d61e.css.map",
-    "main.f6e49ff5.js.map": "/Sprint-Projects-4-ACAMICA/static/js/main.f6e49ff5.js.map",
+    "main.786bfc31.js.map": "/Sprint-Projects-4-ACAMICA/static/js/main.786bfc31.js.map",
     "787.99d6926f.chunk.js.map": "/Sprint-Projects-4-ACAMICA/static/js/787.99d6926f.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.d476d61e.css",
-    "static/js/main.f6e49ff5.js"
+    "static/js/main.786bfc31.js"
   ]
 }
